@@ -1,10 +1,10 @@
 -- This file was automatically generated for the LuaDist project.
 
 package="zee"
-version="0.7-1"
+version="0.7-2"
 -- LuaDist source
 source = {
-  tag = "0.7-1",
+  tag = "0.7-2",
   url = "git://github.com/LuaDist-testing/zee.git"
 }
 -- Original source
@@ -25,7 +25,7 @@ description = {
 }
 dependencies = {
   "lua == 5.2",
-  "stdlib >= 28",
+  "stdlib >= 28, < 35",
   "luaposix >= 5.1.23",
   "lrexlib-gnu >= 2.7.1",
   "alien >= 0.7.0",
