@@ -1,6 +1,6 @@
 # Top-level Makefile.am
 #
-# Copyright (c) 1997-2012 Free Software Foundation, Inc.
+# Copyright (c) 1997-2016 Free Software Foundation, Inc.
 #
 # This file is part of Zee.
 #
@@ -17,60 +17,83 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CLOC = cloc --autoconf
+CLOC = cloc --force-lang=lua,in
 
 ACLOCAL_AMFLAGS = -I m4
 
 LUA_PATH ?= ;
-LUA_ENV = LUA_PATH="$(abs_srcdir)/src/?.lua;$(LUA_PATH)"
+LUA_ENV = LUA_PATH_5_3="$(abs_srcdir)/?.lua;$(abs_srcdir)/?/init.lua;$(LUA_PATH_5_3)"
 
-CLEANFILES =
-MAINTAINERCLEANFILES =
+doc_DATA = FAQ
 
-install_edit = sed \
-	-e 's|^require ("|require ("$(PACKAGE)/|g'
+BUILT_SOURCES =						\
+	$(PACKAGE)/init.lua				\
+	$(PACKAGE)/$(PACKAGE).in
 
-inplace_edit = sed \
-	-e 's|@in_tree_lua_path[@]|$(abs_top_srcdir)/src/?.lua;$(abs_top_builddir)/src/?.lua|g'
+bin_SCRIPTS = $(PACKAGE)/$(PACKAGE)
 
-EXTRA_DIST =						\
-	FAQ						\
-	GNUmakefile					\
-	maint.mk					\
-	$(PACKAGE).rockspec.in
+LUA_RUNTIME =						\
+	$(PACKAGE)/astr.lua				\
+	$(PACKAGE)/eval.lua				\
+	$(PACKAGE)/main.lua				\
+	$(PACKAGE)/variables.lua			\
+	$(PACKAGE)/move.lua				\
+	$(PACKAGE)/buffer.lua				\
+	$(PACKAGE)/completion.lua			\
+	$(PACKAGE)/shell.lua				\
+	$(PACKAGE)/getkey.lua				\
+	$(PACKAGE)/help.lua				\
+	$(PACKAGE)/file.lua				\
+	$(PACKAGE)/cut.lua				\
+	$(PACKAGE)/edit.lua				\
+	$(PACKAGE)/macro.lua				\
+	$(PACKAGE)/minibuf.lua				\
+	$(PACKAGE)/search.lua				\
+	$(PACKAGE)/undo.lua				\
+	$(PACKAGE)/term.lua				\
+	$(PACKAGE)/keycode.lua				\
+	$(PACKAGE)/bind.lua				\
+	$(PACKAGE)/cua_bindings.lua			\
+	$(PACKAGE)/term_curses.lua
 
-DISTCLEANFILES = $(PACKAGE).rockspec
+pkgdata_DATA = $(PACKAGE)/init.lua			\
+	$(LUA_RUNTIME)					\
+	$(PACKAGE)/emacs_bindings.lua
 
-ROCKSPEC = $(PACKAGE)-$(VERSION)-1.rockspec
+PRODUCTIONSOURCES =					\
+	$(LUA_RUNTIME)					\
+	$(PACKAGE)/$(PACKAGE).in			\
+	$(PACKAGE)/init.lua.in				\
+	tests/Makefile.am				\
+	Makefile.am					\
+	configure.ac
 
-doc_DATA = AUTHORS FAQ NEWS
+$(PACKAGE)/init.lua: Makefile.am $(PACKAGE)/init.lua.in
+	cat $(PACKAGE)/init.lua.in > $@
+	for i in $(LUA_RUNTIME); do echo 'require ("'`echo $$i | sed -e 's|\\.lua$$||'`'")' >> $@; done
 
-include build-aux/Makefile.am
-include doc/Makefile.am
-include src/Makefile.am
+install-data-hook:
+	PACKAGE="$(PACKAGE)" PACKAGE_NAME="$(PACKAGE_NAME)" $(LUA_ENV) $(LUA) $(DESTDIR)$(bindir)/$(PACKAGE) --no-init-file --eval "loadfile ('$(srcdir)/build-aux/mkdot$(PACKAGE).lua') ()" > $@.tmp
+	$(INSTALL_DATA) $@.tmp $(DESTDIR)$(pkgdatadir)/dot$(PACKAGE).sample
+	rm -f $@.tmp
+
 include tests/Makefile.am
 
 loc:
-	$(CLOC) $(PRODUCTIONSOURCES) $(srcdir)/build-aux/mkdot$(PACKAGE).lua $(srcdir)/cfg.mk $(srcdir)/bootstrap.conf
+	$(CLOC) $(PRODUCTIONSOURCES) $(srcdir)/build-aux/mkdot$(PACKAGE).lua $(srcdir)/mkrockspecs.lua $(srcdir)/rockspecs.lua
 
 loc-tests:
 	$(CLOC) $(ALL_TESTS) $(srcdir)/build-aux/run-tests.lua
 
-distcheck-hook: syntax-check
+rockspecs:
+	rm -f *.rockspec
+	$(LUA) mkrockspecs.lua $(PACKAGE) $(VERSION)
+	$(LUA) mkrockspecs.lua $(PACKAGE) git
 
-WOGER_ARGS = package=$(PACKAGE) version=$(VERSION) notes=release-notes-$(VERSION) dist_type="tar.gz"
-
-# Depend on distcheck so that 'make release' runs distcheck before
-# making the rockspec, so the release archive MD5sum is correct in the
-# rockspec
-$(ROCKSPEC): $(PACKAGE).rockspec distcheck
-	sed -e 's/_MD5_/'`$(MD5SUM) $(distdir).tar.gz | cut -d " " -f 1`'/g' < $(PACKAGE).rockspec > $@
-
-release: $(ROCKSPEC)
+release: rockspecs
 	git diff --exit-code && \
 	git push && \
-	woger github $(WOGER_ARGS) && \
-	LUAROCKS_CONFIG=$(abs_srcdir)/luarocks-config.lua luarocks --tree=$(abs_srcdir)/luarocks make $(ROCKSPEC) && \
-	woger freecode,lua $(WOGER_ARGS) && \
 	git tag -a -m "Release tag" v$(VERSION) && \
-	git push --tags
+	git push --tags && \
+	LUAROCKS_CONFIG=$(abs_srcdir)/luarocks-config.lua luarocks --tree=$(abs_srcdir)/luarocks build $(PACKAGE)-$(VERSION)-1.rockspec && \
+	woger luarocks package=$(PACKAGE) version=$(VERSION)

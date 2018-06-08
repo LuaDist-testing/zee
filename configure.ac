@@ -1,6 +1,6 @@
 dnl configure.ac
 dnl
-dnl Copyright (c) 1997-2012 Free Software Foundation, Inc.
+dnl Copyright (c) 1997-2016 Free Software Foundation, Inc.
 dnl
 dnl This file is part of Zee.
 dnl
@@ -20,25 +20,13 @@ dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AC_PREREQ([2.61])
 
 dnl Initialise autoconf and automake
-AC_INIT([Zee], [0.7], [zee-devel@lists.sourceforge.net])
+AC_INIT([Zee], [0.7.2], [https://github.com/rrthomas/zee])
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign])
-AM_SILENT_RULES([yes])
-
-dnl Set up gnulib
-gl_EARLY
-gl_INIT
+AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign silent-rules])
 
 dnl Lua
-AC_SUBST([LUA_VERSION], [5.2])
-AX_PROG_LUA([$LUA_VERSION])
-
-dnl help2man
-AX_WITH_PROG([HELP2MAN], [help2man], [false])
-
-dnl md5sum
-AX_WITH_PROG([MD5SUM], [md5sum], [false])
+AX_PROG_LUA
 
 dnl Generate output
-AC_CONFIG_FILES(Makefile src/zee.lua $PACKAGE.rockspec luarocks-config.lua)
+AC_CONFIG_FILES([Makefile zee/zee luarocks-config.lua], [chmod +x zee/zee])
 AC_OUTPUT

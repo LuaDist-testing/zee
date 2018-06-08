@@ -1,0 +1,41 @@
+#!/bin/sh
+A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
+--
+-- Program initialisation
+--
+-- Copyright (c) 2010-2014 Free Software Foundation, Inc.
+--
+-- This file is part of Zee.
+--
+-- This program is free software; you can redistribute it and/or modify it
+-- under the terms of the GNU General Public License as published by
+-- the Free Software Foundation; either version 3, or (at your option)
+-- any later version.
+--
+-- This program is distributed in the hope that it will be useful, but
+-- WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-- General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+-- Constants set by configure
+PACKAGE = "@PACKAGE@"
+PACKAGE_NAME = "@PACKAGE_NAME@"
+PACKAGE_BUGREPORT = "@PACKAGE_BUGREPORT@"
+VERSION = "@VERSION@"
+
+require "luarocks.loader"
+require (PACKAGE)
+
+
+local function err (err)
+  term_close ()
+  print ("Internal error. Please report this bug with steps to reproduce the problem.")
+  print (debug.traceback(err, 2))
+  os.exit (2)
+end
+
+xpcall (main, err)

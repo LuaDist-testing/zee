@@ -3,7 +3,7 @@ Zee
 
 Zee is free software, licensed under the GNU GPL.
 
-Copyright (c) 1997-2012 Free Software Foundation, Inc.
+Copyright (c) 1997-2016 Free Software Foundation, Inc.
 
 **Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
@@ -19,7 +19,7 @@ Zee's home page is at:
 
   > <https://github.com/rrthomas/zee>
 
-Zee is written in Lua 5.2 using POSIX APIs, and requires these
+Zee is written in Lua 5.3 using POSIX APIs, and requires these
 additional modules:
 
  * Lua stdlib <https://github.com/rrthomas/lua-stdlib>
@@ -29,7 +29,7 @@ additional modules:
    (the curses module must be built)
  * alien <http://mascarenhas.github.com/alien/>
 
-For the exact versions required, see `src/loadlibs.lua.in`.
+For the exact versions required, see `rockspecs.lua`.
 
 
 INSTALLING
@@ -44,10 +44,10 @@ Run:
 
     luarocks install zee
 
-Development sources are available from the web page. When you are
-building Zee from a git checkout, you first need to run the
-`bootstrap` script to generate various files that are shipped in
-release tarballs, but not checked in to git.
+Development sources are available from the web page. You can build the
+latest development sources with:
+
+   luarocks build https://github.com/rrthomas/zee/raw/master/zee-git-1.rockspec
 
 
 REPORTING BUGS
@@ -75,3 +75,10 @@ If, when you report a bug, you can create a similar test that
 demonstrates it, the maintainers will be most grateful, and it will
 prevent them from accidentally reintroducing the bug in a subsequent
 release.
+
+
+RELATED WORK
+============
+
+[Zim][http://zim-wiki.org/]
+[Leo][http://webpages.charter.net/edreamleo/front.html]
