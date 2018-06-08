@@ -1,0 +1,8 @@
+call_command ("move-next-line")
+call_command ("move-next-word")
+call_command ("move-next-word")
+call_command ("move-next-word")
+call_command ("move-start-line")
+insert_string ("a")
+call_command ("file-save")
+call_command ("file-quit")

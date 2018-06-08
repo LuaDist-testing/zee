@@ -1,0 +1,5 @@
+call_command ("preferences-set-variable", "caseless-search", false)
+execute_command ("edit-find", "I")
+insert_string ("a")
+call_command ("file-save")
+call_command ("file-quit")

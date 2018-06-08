@@ -1,0 +1,8 @@
+call_command ("edit-select-on")
+call_command ("move-next-line")
+call_command ("move-next-line")
+call_command ("move-next-line")
+call_command ("move-next-line")
+call_command ("edit-shell-command", "sort")
+call_command ("file-save")
+call_command ("file-quit")

@@ -1,0 +1,7 @@
+call_command ("move-next-line")
+call_command ("move-next-line")
+call_command ("edit-indent")
+call_command ("edit-indent")
+insert_string ("tab")
+call_command ("file-save")
+call_command ("file-quit")
